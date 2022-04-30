@@ -1,3 +1,4 @@
+import { EmailService } from './../services/EmailService';
 import { PrismaClient } from '@prisma/client';
 import { BodyParams, PathParams, QueryParams } from '@tsed/common';
 import { Controller, Inject } from '@tsed/di';
@@ -21,7 +22,15 @@ export class UserController {
   @Get('/all')
   @Summary('Return list of users by ids')
   @Returns(200, Array).Of(UserModel)
-  getAll() {
+  async getAll() {
+    await EmailService.sendEmail({
+      from: 'bot@ljungskile-bil.se',
+      to: 'mohmmedmaani@hotmail.com',
+      text: 'hello',
+      html: '<h2>hello</h2>',
+      subject: 'test email',
+      attachments: [],
+    });
     return this.prisma.user.findMany();
   }
 
@@ -47,7 +56,7 @@ export class UserController {
   @Returns(201, Array).Of(number)
   async insert(@BodyParams() @Groups('creation') user: UserModel) {
     console.log('user', user);
-    return this.prisma.user.create({ data: user });
+    return this.prisma.user.create({ data: { ...user, roleId: 1 } });
   }
 
   @Put('/:id')
