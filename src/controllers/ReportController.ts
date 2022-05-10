@@ -49,7 +49,9 @@ export class ReportController {
   @Returns(201, Array).Of(number)
   async insert(@BodyParams() @Groups('creation') report: ReportModel) {
     console.log('report', report);
-    return this.prisma.report.create({ data: report });
+    return this.prisma.report.create({
+      data: { ...report, title: 'problem', userId: 1 },
+    });
   }
 
   @Put('/:id')

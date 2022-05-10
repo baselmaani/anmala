@@ -7,7 +7,7 @@ export class ReportModel implements Report {
   createdAt: Date;
   updatedAt: Date;
   userId: number;
-  longitude: number;
-  latitude: number;
+  longitude: string;
+  latitude: string;
   img: string;
 }

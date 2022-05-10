@@ -1,3 +1,4 @@
+import { UserInput } from './../models/UserModel';
 import { EmailService } from './../services/EmailService';
 import { PrismaClient } from '@prisma/client';
 import { BodyParams, PathParams, QueryParams } from '@tsed/common';
@@ -13,6 +14,8 @@ import {
   Summary,
 } from '@tsed/schema';
 import { UserModel } from 'src/models/UserModel';
+import { AuthService } from 'src/services/AuthService';
+import { Authorize } from '@tsed/passport';
 
 @Controller('/users')
 export class UserController {
@@ -35,6 +38,7 @@ export class UserController {
   }
 
   @Get('/many')
+  @Authorize('admin')
   @Summary('Return list of users by ids')
   @Returns(200, Array).Of(UserModel)
   getManyById(@QueryParams('id') id: string[]) {
@@ -46,17 +50,20 @@ export class UserController {
   @Get('/:id')
   @Summary('Return user by id')
   @Returns(200, UserModel)
-  getOne(@PathParams() params: { id: string }) {
+  getOne(@PathParams() params: { id: number }) {
     const { id } = params;
-    return this.prisma.user.findFirst({ where: { id: parseInt(id) } });
+    return this.prisma.user.findFirst({ where: { id } });
   }
 
   @Post('/')
   @Summary('Create a new user')
   @Returns(201, Array).Of(number)
-  async insert(@BodyParams() @Groups('creation') user: UserModel) {
+  async insert(@BodyParams() @Groups('creation') user: UserInput) {
     console.log('user', user);
-    return this.prisma.user.create({ data: { ...user, roleId: 1 } });
+    const hashedPassword = await AuthService.hashPassword(user.password);
+    return this.prisma.user.create({
+      data: { ...user, password: hashedPassword, roleId: 1 },
+    });
   }
 
   @Put('/:id')

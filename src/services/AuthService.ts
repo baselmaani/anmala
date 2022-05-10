@@ -1,5 +1,5 @@
 import { EmailService } from './EmailService';
-import { UserModel } from './../models/UserModel';
+import { GenerateTokenInput } from './../models/UserModel';
 import { PrismaService } from 'src/services/PrismaService';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -15,7 +15,7 @@ export class AuthService {
     return await bcrypt.compare(password, hash);
   }
 
-  static async generateToken(user: UserModel) {
+  static async generateToken(user: GenerateTokenInput) {
     return await jwt.sign(
       {
         id: user.id,
@@ -62,7 +62,12 @@ export class AuthService {
       throw new Error('password  did not match');
     }
 
-    const token = await this.generateToken(user);
+    const token = await this.generateToken({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      tel: user.tel || '',
+    });
     return { token };
   }
 

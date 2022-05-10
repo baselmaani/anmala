@@ -25,6 +25,7 @@ export class AdminProtocol implements OnVerify {
     const user = await this.authService.user.findFirst({
       where: { id },
     });
+    req.user = user || undefined;
 
     return user ? user : false;
   }
