@@ -11,10 +11,10 @@ export class AuthController {
     return 'hello';
   }
 
-  @Post('/')
+  @Post('/login')
   @Summary('Create a new user')
   @Returns(201, TokenResultType)
   async insert(@BodyParams() @Groups('creation') user: UserInput) {
-    return AuthService.login(user.email, user.password, 'normal');
+    return AuthService.login(user.email, user.password, 'user');
   }
 }
